@@ -12,6 +12,7 @@ import aboutRouter from './about.js';
 import awardRouter from './awards.js';
 import contactRouter from './contact.js';
 import authRouter from './auth.js';
+import emailRouter from './email.js';
 
 import authMiddleware from '../middleware/auth.js';
 
@@ -38,5 +39,6 @@ router.use('/cms', cmsRouter);
 router.use('/services', serviceRouter);
 router.use('/about', aboutRouter);
 router.use('/awards', awardRouter);
+router.use('/email', emailRouter);
 
 export default router;

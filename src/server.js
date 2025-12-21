@@ -2,10 +2,17 @@ import express from "express";
 import cors from "cors";
 import sequelize from "./config/database.js";
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 import routes from "./routes/index.js";
+import dashboardRoutes from "./routes/dashboard.js";
 // import swaggerUi from 'swagger-ui-express';
 // import swaggerSpecs from './config/swagger.js';
 import { adminJs, adminRouter } from './config/admin.js';
@@ -20,10 +27,23 @@ app.use('/uploads', express.static('public/uploads'));
 
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/api', routes);
+app.use('/api/dashboard', dashboardRoutes);
 
-// Health check
-app.get("/", (req, res) => {
-  res.send("Jobo Backend API is running");
+// Serve standalone dashboard
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/dashboard.html'));
+});
+
+// Serve Angular Static Files
+const frontendPath = path.join(__dirname, '../public/frontend');
+app.use(express.static(frontendPath));
+
+// Handle Angular Routing (Catch-all) - Must be AFTER API routes
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/admin')) {
+      return res.status(404).json({ error: 'Not Found' });
+  }
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 const startServer = async () => {

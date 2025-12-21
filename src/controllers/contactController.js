@@ -1,4 +1,4 @@
-import { Contact } from '../models/index.js';
+import { Contact, SentEmail } from '../models/index.js';
 import axios from 'axios';
 import nodemailer from 'nodemailer';
 import accessEnv from '../../access_env.js';
@@ -37,27 +37,21 @@ export const createContact = async (req, res) => {
     });
 
     // 3. Send Email
-    // Configure transporter
-    // Credentials from settings.py:
-    // EMAIL_HOST = 'mail.pollersport.com'
-    // EMAIL_PORT = 465
-    // EMAIL_USE_SSL = True
-    // EMAIL_HOST_USER = 'mail@pollersport.com'
-    // EMAIL_HOST_PASSWORD = 'Jobo@email64252' 
-
     const transporter = nodemailer.createTransport({
-      host: 'mail.pollersport.com',
-      port: 465,
-      secure: true, // true for 465, false for other ports
+      host: accessEnv('SMTP_HOST', 'smtp.gmail.com'),
+      port: parseInt(accessEnv('SMTP_PORT', '465')),
+      secure: accessEnv('SMTP_PORT', '465') === '465',
       auth: {
-        user: 'mail@pollersport.com',
-        pass: 'Jobo@email64252'
+        user: accessEnv('SMTP_USER', 'jobostructurals@gmail.com'),
+        pass: accessEnv('SMTP_PASS', 'abcd-efgh-ijkl-mnop') // Dummy for now
       }
     });
 
+    const recipientTo = accessEnv('CONTACT_EMAIL_TO', 'jobostructurals@gmail.com').split(',');
+
     const mailOptions = {
-      from: 'mail@pollersport.com',
-      to: ['jobostructurals@gmail.com', 'mail@pollersport.com'],
+      from: accessEnv('SMTP_USER', 'jobostructurals@gmail.com'),
+      to: recipientTo,
       subject: `New Contact Message from ${name}`,
       text: `
         You have received a new contact message:
@@ -70,12 +64,17 @@ export const createContact = async (req, res) => {
       `
     };
 
-    // Send email asynchronously (fire and forget or await? Django does send_mail which is synchronous by default unless configured otherwise, but usually fast enough. Here we can await to report error.)
     try {
         await transporter.sendMail(mailOptions);
+        // Log to database
+        await SentEmail.create({
+            to: recipientTo.join(','),
+            subject: mailOptions.subject,
+            body: mailOptions.text,
+            type: 'contact'
+        });
     } catch (emailError) {
         console.error("Email sending failed:", emailError);
-        // We still return success for the contact creation, but maybe log warning.
     }
 
     res.status(201).json(newContact);

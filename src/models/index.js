@@ -14,6 +14,7 @@ import AboutUs from './AboutUs.js';
 import Award from './Award.js';
 import Contact from './Contact.js';
 import User from './User.js';
+import SentEmail from './SentEmail.js';
 
 // Project Category Associations (Self-referential)
 ProjectCategory.belongsTo(ProjectCategory, { as: 'parent_category', foreignKey: 'parent_id' });
@@ -61,5 +62,6 @@ export {
   AboutUs,
   Award,
   Contact,
-  User
+  User,
+  SentEmail
 };

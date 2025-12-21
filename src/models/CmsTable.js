@@ -28,10 +28,6 @@ const CmsTable = sequelize.define('CmsTable', {
   whatwedo: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
-  },
-  uploaded_images_cache: {
-    type: DataTypes.JSON,
-    allowNull: true
   }
 }, {
   tableName: 'api_cmstable',

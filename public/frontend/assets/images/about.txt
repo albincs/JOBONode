@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Updock
+- Font Author: Copyright 1991-2021 The Up Dock Project Authors (https://github.com/googlefonts/updock)
+- Font Source: https://fonts.gstatic.com/s/updock/v5/nuF4D_3dVZ70UI9SjLK3602XBw.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobo Structurals - Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-content h1 {
+            color: #1a202c;
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .header-content p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 18px;
+        }
+
+        .filter-btn:hover {
+            background: #5568d3;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid;
+        }
+
+        .summary-card h3 {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .summary-card .subtitle {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h2 {
+            color: #1a202c;
+            font-size: 18px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fff5f5;
+            color: #c53030;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                width: 100%;
+            }
+
+            .filter-group {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/admin" class="back-link">← Back to Admin Panel</a>
+
+    <div class="header">
+        <div class="header-content">
+            <h1>📊 Analytics Dashboard</h1>
+            <p>Key metrics and insights for your business</p>
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label>Start Date</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label>End Date</label>
+                <input type="date" id="endDate">
+            </div>
+            <button class="filter-btn" onclick="applyFilters()">Apply Filters</button>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <div class="loading">Loading dashboard...</div>
+    </div>
+
+    <script>
+        let charts = {};
+
+        async function loadDashboard(filters = {}) {
+            try {
+                const queryParams = new URLSearchParams(filters).toString();
+                const url = `/api/dashboard/stats${queryParams ? '?' + queryParams : ''}`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch statistics');
+                const stats = await response.json();
+
+                renderDashboard(stats);
+            } catch (error) {
+                document.getElementById('dashboard').innerHTML = `
+                    <div class="error">
+                        <strong>Error loading dashboard:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function applyFilters() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            const filters = {};
+            if (startDate) filters.startDate = startDate;
+            if (endDate) filters.endDate = endDate;
+
+            loadDashboard(filters);
+        }
+
+        function renderDashboard(stats) {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
+            const html = `
+                <div class="stats-summary">
+                    <div class="summary-card" style="border-left-color: #667eea;">
+                        <h3>Total Projects</h3>
+                        <div class="value">${stats.projects?.total || 0}</div>
+                        <div class="subtitle">${stats.projects?.completed || 0} completed</div>
+                    </div>
+                    <div class="summary-card" style="border-left-color: #fa709a;">
+                        <h3>Total Revenue</h3>
+                        <div class="value" style="font-size: 24px;">${stats.revenue?.formatted || '₹0'}</div>
+                    </div>
+                    <div class="summary-card" style="border-left-color: #43e97b;">
+                        <h3>Total Tasks</h3>
+                        <div class="value">${stats.tasks?.total || 0}</div>
+                        <div class="subtitle">${stats.tasks?.completionRate || 0}% completed</div>
+                    </div>
+                    <div class="summary-card" style="border-left-color: #f093fb;">
+                        <h3>Total Clients</h3>
+                        <div class="value">${stats.clients?.total || 0}</div>
+                    </div>
+                    <div class="summary-card" style="border-left-color: #30cfd0;">
+                        <h3>Team Members</h3>
+                        <div class="value">${stats.team?.total || 0}</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h2>📈 Projects by Month</h2>
+                        <div class="chart-container">
+                            <canvas id="projectsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h2>💰 Revenue Trend</h2>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h2>📊 Project Status Distribution</h2>
+                        <div class="chart-container">
+                            <canvas id="projectStatusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h2>✅ Task Completion Status</h2>
+                        <div class="chart-container">
+                            <canvas id="tasksChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('dashboard').innerHTML = html;
+
+            // Create charts
+            createProjectsChart(stats.projects?.byMonth || []);
+            createRevenueChart(stats.revenue?.byMonth || []);
+            createProjectStatusChart(stats.projects);
+            createTasksChart(stats.tasks);
+        }
+
+        function createProjectsChart(data) {
+            const ctx = document.getElementById('projectsChart');
+            if (!ctx) return;
+
+            const labels = data.map(d => {
+                const [year, month] = d.month.split('-');
+                return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            });
+            const values = data.map(d => parseInt(d.count));
+
+            charts.projects = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Projects Started',
+                        data: values,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+
+        function createRevenueChart(data) {
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            const labels = data.map(d => {
+                const [year, month] = d.month.split('-');
+                return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            });
+            const values = data.map(d => parseFloat(d.revenue) || 0);
+
+            charts.revenue = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: values,
+                        backgroundColor: '#fa709a',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return '₹' + (value / 100000).toFixed(1) + 'L';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createProjectStatusChart(projects) {
+            const ctx = document.getElementById('projectStatusChart');
+            if (!ctx) return;
+
+            charts.projectStatus = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Ongoing', 'Upcoming'],
+                    datasets: [{
+                        data: [
+                            projects?.completed || 0,
+                            projects?.ongoing || 0,
+                            projects?.upcoming || 0
+                        ],
+                        backgroundColor: ['#43e97b', '#4facfe', '#feca57'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        function createTasksChart(tasks) {
+            const ctx = document.getElementById('tasksChart');
+            if (!ctx) return;
+
+            charts.tasks = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Pending'],
+                    datasets: [{
+                        data: [
+                            tasks?.completed || 0,
+                            tasks?.pending || 0
+                        ],
+                        backgroundColor: ['#43e97b', '#ff6b6b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // Load dashboard on page load
+        loadDashboard();
+    </script>
+</body>
+
+</html>
