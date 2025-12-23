@@ -156,8 +156,8 @@ const adminJs = new AdminJS({
           end_date: { position: 4, type: 'date' },
           is_completed: { position: 5 },
           cost_estimation: { position: 6 },
-          client_id: { isVisible: { list: false, show: true, edit: true, filter: true }, resourceId: 'Client' },
-          category_id: { isVisible: { list: false, show: true, edit: true, filter: true }, resourceId: 'ProjectCategory' },
+          // client_id: { isVisible: { list: false, show: true, edit: true, filter: true }, resourceId: 'Client' },
+          // category_id: { isVisible: { list: false, show: true, edit: true, filter: true }, resourceId: 'ProjectCategory' },
           // Reference to ProjectImages
           // Reference to ProjectImages
           images: {
