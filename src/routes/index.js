@@ -13,6 +13,7 @@ import awardRouter from './awards.js';
 import contactRouter from './contact.js';
 import authRouter from './auth.js';
 import emailRouter from './email.js';
+import resourcesRouter from './resources.js';
 
 import authMiddleware from '../middleware/auth.js';
 
@@ -40,5 +41,6 @@ router.use('/services', serviceRouter);
 router.use('/about', aboutRouter);
 router.use('/awards', awardRouter);
 router.use('/email', emailRouter);
+router.use('/', resourcesRouter); // Mounted at root of /api so we get /api/tasks etc.
 
 export default router;

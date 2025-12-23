@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import serverless from "serverless-http";
 import sequelize from "./config/database.js";
 
 import path from 'path';
@@ -62,4 +63,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+export const handler = serverless(app);
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    startServer();
+}

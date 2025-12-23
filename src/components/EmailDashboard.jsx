@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, H2, Text, Input, Label, TextArea, Icon } from '@adminjs/design-system';
+import { Box, Button, H2, Text, Input, Label, Icon } from '@adminjs/design-system';
+import ReactQuill from 'react-quill';
 
 const EmailDashboard = () => {
   const [activeTab, setActiveTab] = useState('logs');
@@ -14,6 +15,17 @@ const EmailDashboard = () => {
   const [composeBody, setComposeBody] = useState('');
   const [sending, setSending] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Add Quill CSS dynamically to avoid bundling issues
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/react-quill@1.3.5/dist/quill.snow.css';
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -59,11 +71,28 @@ const EmailDashboard = () => {
     }
   };
 
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline','strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const quillFormats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image'
+  ];
+
   return (
     <Box variant="container" p="xl" bg="white">
       <Box mb="xl">
         <H2>Email Communications</H2>
-        <Text color="gray.600">Track contact form submissions and send new communications.</Text>
+        <Text color="gray.600">Track contact form submissions and send new communications with rich text.</Text>
       </Box>
 
       <Box flex flexDirection="row" borderBottom="1px solid #ddd" mb="xl">
@@ -97,7 +126,7 @@ const EmailDashboard = () => {
       )}
 
       {activeTab === 'compose' && (
-        <Box maxWidth="600px">
+        <Box maxWidth="800px">
           <form onSubmit={handleSend}>
             <Box mb="lg">
               <Label>To</Label>
@@ -107,15 +136,24 @@ const EmailDashboard = () => {
               <Label>Subject</Label>
               <Input width={1} value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} required />
             </Box>
-            <Box mb="lg">
-              <Label>Message</Label>
-              <TextArea rows={8} value={composeBody} onChange={(e) => setComposeBody(e.target.value)} required />
+            <Box mb="xl">
+              <Label mb="md">Message</Label>
+              <Box bg="white" minHeight="200px">
+                <ReactQuill 
+                  theme="snow"
+                  value={composeBody}
+                  onChange={setComposeBody}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  style={{ height: '300px', marginBottom: '50px' }}
+                />
+              </Box>
             </Box>
             
             {error && <Text color="danger" mb="lg">{error}</Text>}
             {successMsg && <Text color="success" mb="lg">{successMsg}</Text>}
 
-            <Button variant="primary" type="submit" disabled={sending}>
+            <Button variant="primary" type="submit" disabled={sending} mt="xl">
               {sending ? 'Sending...' : 'Send Message'}
             </Button>
           </form>
@@ -134,8 +172,8 @@ const EmailDashboard = () => {
               <Text><strong>To:</strong> {selectedEmail.to}</Text>
               <Text><strong>Date:</strong> {new Date(selectedEmail.date).toLocaleString()}</Text>
             </Box>
-            <Box mt="lg">
-              <div dangerouslySetInnerHTML={{ __html: typeof selectedEmail.html === 'string' ? selectedEmail.html.replace(/\n/g, '<br/>') : 'No content' }} />
+            <Box mt="lg" className="email-content-view">
+              <div dangerouslySetInnerHTML={{ __html: typeof selectedEmail.html === 'string' ? selectedEmail.html : (typeof selectedEmail.body === 'string' ? selectedEmail.body.replace(/\n/g, '<br/>') : 'No content') }} />
             </Box>
           </Box>
         </Box>

@@ -3,7 +3,7 @@ import AdminJSExpress from '@adminjs/express';
 import AdminJSSequelize from '@adminjs/sequelize';
 import uploadFeature from '@adminjs/upload';
 import { LocalProvider } from '@adminjs/upload';
-import { User, Project, Team, Client, Testimonial, ProjectCategory, CmsTable, Service, AboutUs, Award, Contact, Task, Cost, ProjectImage, CmsTableImage, SentEmail } from '../models/index.js';
+import { User, Project, Team, Client, Testimonial, ProjectCategory, CmsTable, Service, AboutUs, Award, Contact, Task, Cost, ProjectImage, CmsTableImage, SentEmail, ProjectURL } from '../models/index.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
@@ -120,6 +120,8 @@ const adminJs = new AdminJS({
     { 
       resource: User, 
       options: { 
+        id: 'User',
+        label: 'Users',
         navigation: { name: 'User Management', icon: 'User' },
         listProperties: ['email', 'username', 'role', 'is_active', 'is_staff'],
         properties: { 
@@ -133,13 +135,13 @@ const adminJs = new AdminJS({
           first_name: { isVisible: { list: false, show: true, edit: true, filter: false } },
           last_name: { isVisible: { list: false, show: true, edit: true, filter: false } },
         },
-        actions: drawerActions,
-        navigation: { name: 'User Management', icon: 'User' }
       } 
     },
     { 
       resource: Project, 
       options: { 
+        id: 'Project',
+        label: 'Projects',
         navigation: { name: 'Projects', icon: 'Folder' },
         listProperties: ['title', 'slug', 'start_date', 'end_date', 'is_completed'],
         properties: { 
@@ -154,8 +156,8 @@ const adminJs = new AdminJS({
           end_date: { position: 4, type: 'date' },
           is_completed: { position: 5 },
           cost_estimation: { position: 6 },
-          client_id: { isVisible: { list: false, show: true, edit: true, filter: true } },
-          category_id: { isVisible: { list: false, show: true, edit: true, filter: true } },
+          client_id: { isVisible: { list: false, show: true, edit: true, filter: true }, resourceId: 'Client' },
+          category_id: { isVisible: { list: false, show: true, edit: true, filter: true }, resourceId: 'ProjectCategory' },
           // Reference to ProjectImages
           // Reference to ProjectImages
           images: {
@@ -171,7 +173,6 @@ const adminJs = new AdminJS({
           new: { ...drawerActions.new, after: processProjectImages },
           edit: { ...drawerActions.edit, after: processProjectImages }
         },
-        navigation: { name: 'Projects', icon: 'Folder' }
       },
       features: [
         localUploadFeature({ 
@@ -184,6 +185,8 @@ const adminJs = new AdminJS({
     { 
       resource: Team, 
       options: { 
+        id: 'TeamMember',
+        label: 'Team Members',
         navigation: { name: 'Company', icon: 'Users' },
         listProperties: ['uploadedImage', 'name', 'designation', 'email', 'phone_number'],
         properties: { 
@@ -197,13 +200,14 @@ const adminJs = new AdminJS({
           qualification: { isVisible: { list: false, show: true, edit: true, filter: false } }
         },
         actions: drawerActions,
-        navigation: { name: 'Company', icon: 'Users' }
       },
       features: [localUploadFeature({ key: 'image', file: 'uploadedImage' })]
     },
     { 
       resource: Client, 
       options: { 
+        id: 'Client',
+        label: 'Clients',
         navigation: { name: 'Company', icon: 'Briefcase' },
         listProperties: ['logo', 'name', 'email', 'phone'],
         properties: { 
@@ -215,13 +219,14 @@ const adminJs = new AdminJS({
           phone: { position: 4 }
         },
         actions: drawerActions,
-        navigation: { name: 'Company', icon: 'Briefcase' }
       },
       features: [localUploadFeature({ key: 'logo', file: 'uploadedLogo' })]
     },
     { 
       resource: Testimonial, 
       options: { 
+        id: 'Testimonial',
+        label: 'Testimonials',
         navigation: { name: 'Company', icon: 'MessageSquare' },
         listProperties: ['photo', 'name', 'role', 'created_at'],
         properties: { 
@@ -237,28 +242,30 @@ const adminJs = new AdminJS({
           created_at: { position: 4, type: 'datetime' }
         },
         actions: drawerActions,
-        navigation: { name: 'Company', icon: 'MessageSquare' }
       },
       features: [localUploadFeature({ key: 'photo', file: 'uploadedPhoto' })]
     },
     { 
       resource: ProjectCategory, 
       options: { 
+        id: 'ProjectCategory',
+        label: 'Categories',
         navigation: { name: 'Projects', icon: 'Tag' },
         listProperties: ['name', 'slug', 'parent_id'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           name: { isTitle: true, position: 1 },
           slug: { position: 2, isVisible: { list: true, show: true, edit: false, filter: true, new: false } },
-          parent_id: { position: 3 }
+          parent_id: { position: 3, resourceId: 'ProjectCategory' }
         },
         actions: drawerActions,
-        navigation: { name: 'Projects', icon: 'Tag' }
       } 
     },
     { 
       resource: CmsTable, 
       options: { 
+        id: 'CmsTable',
+        label: 'CMS Tables',
         navigation: { name: 'Content', icon: 'FileText' },
         listProperties: ['title', 'slug', 'created_at'],
         properties: { 
@@ -285,7 +292,6 @@ const adminJs = new AdminJS({
           new: { ...drawerActions.new, after: processCmsTableImages },
           edit: { ...drawerActions.edit, after: processCmsTableImages }
         },
-        navigation: { name: 'Content', icon: 'FileText' }
       },
       features: [
         localUploadFeature({ 
@@ -298,6 +304,8 @@ const adminJs = new AdminJS({
     { 
       resource: Service, 
       options: { 
+        id: 'Service',
+        label: 'Services',
         navigation: { name: 'Content', icon: 'Box' },
         listProperties: ['image', 'title', 'slug', 'created_at'],
         properties: { 
@@ -313,13 +321,14 @@ const adminJs = new AdminJS({
           created_at: { position: 4, type: 'datetime' }
         },
         actions: drawerActions,
-        navigation: { name: 'Content', icon: 'Box' }
       },
       features: [localUploadFeature({ key: 'image', file: 'uploadedImage' })]
     },
     { 
       resource: AboutUs, 
       options: { 
+        id: 'AboutUs',
+        label: 'About Us',
         navigation: { name: 'Content', icon: 'Info' },
         listProperties: ['title', 'slug', 'created_at'],
         properties: { 
@@ -333,12 +342,13 @@ const adminJs = new AdminJS({
           created_at: { position: 3, type: 'datetime' }
         },
         actions: drawerActions,
-        navigation: { name: 'Content', icon: 'Info' }
       } 
     },
     { 
       resource: Award, 
       options: { 
+        id: 'Award',
+        label: 'Awards',
         navigation: { name: 'Company', icon: 'Award' },
         listProperties: ['image', 'title', 'date', 'awarded_by', 'venue'],
         properties: { 
@@ -352,16 +362,18 @@ const adminJs = new AdminJS({
           description: { 
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
-          }
+          },
+          project_id: { resourceId: 'Project' }
         },
         actions: drawerActions,
-        navigation: { name: 'Company', icon: 'Award' }
       },
       features: [localUploadFeature({ key: 'image', file: 'uploadedImage' })] 
     },
     { 
       resource: Contact, 
       options: { 
+        id: 'Contact',
+        label: 'Contact Inquiries',
         navigation: { name: 'Communications', icon: 'Mail' },
         listProperties: ['email', 'name', 'phone_number', 'created_at'],
         properties: { 
@@ -376,18 +388,19 @@ const adminJs = new AdminJS({
           created_at: { position: 4, type: 'datetime' }
         },
         actions: drawerActions,
-        navigation: { name: 'Communications', icon: 'Mail' }
       } 
     },
     { 
       resource: Task, 
       options: { 
+        id: 'Task',
+        label: 'Project Tasks',
         navigation: { name: 'Projects', icon: 'CheckSquare' },
         listProperties: ['name', 'project_id', 'created_at'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           name: { isTitle: true, position: 1 },
-          project_id: { position: 2 },
+          project_id: { position: 2, resourceId: 'Project' },
           description: { 
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
@@ -395,65 +408,69 @@ const adminJs = new AdminJS({
           created_at: { position: 3, type: 'datetime' }
         },
         actions: drawerActions,
-        navigation: { name: 'Projects', icon: 'CheckSquare' }
       } 
     },
     { 
       resource: Cost, 
       options: { 
+        id: 'Cost',
+        label: 'Project Costs',
         navigation: { name: 'Projects', icon: 'DollarSign' },
         listProperties: ['name', 'amount', 'project_id'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           name: { isTitle: true, position: 1 },
           amount: { position: 2, type: 'currency' },
-          project_id: { position: 3 },
+          project_id: { position: 3, resourceId: 'Project' },
           description: { 
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           }
         },
         actions: drawerActions,
-        navigation: { name: 'Projects', icon: 'DollarSign' }
       } 
     },
-    {
-      resource: ProjectImage,
-      options: {
+    { 
+      resource: ProjectImage, 
+      options: { 
+        id: 'ProjectPhoto',
+        label: 'Project Photos',
         navigation: { name: 'Projects', icon: 'Image' },
         listProperties: ['uploadedFile', 'project_id', 'created_at'],
         properties: {
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           image: { isVisible: false },
           uploadedFile: { isVisible: { list: true, show: true, edit: true, filter: false }, position: 1 },
-          project_id: { position: 2 },
+          project_id: { position: 2, resourceId: 'Project' },
           created_at: { position: 3, type: 'datetime' }
         },
         actions: drawerActions,
-        navigation: { name: 'Projects', icon: 'Image' }
       },
       features: [localUploadFeature({ key: 'image', file: 'uploadedFile' })]
     },
-    {
-      resource: CmsTableImage,
-      options: {
+    { 
+      resource: CmsTableImage, 
+      options: { 
+        id: 'CmsTablePhoto',
+        label: 'CMS Table Photos',
         navigation: { name: 'Content', icon: 'Image' },
         listProperties: ['uploadedFile', 'cmstable_id', 'order'],
         properties: {
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           image: { isVisible: false }, // Handled by upload feature
           uploadedFile: { isVisible: { list: true, show: true, edit: true, filter: false }, position: 1 },
-          cmstable_id: { position: 2 },
+          cmstable_id: { position: 2, resourceId: 'CmsTable' },
           order: { position: 3 }
         },
         actions: drawerActions,
-        navigation: { name: 'Content', icon: 'Image' }
       },
       features: [localUploadFeature({ key: 'image', file: 'uploadedFile' })]
     },
-    {
-      resource: SentEmail,
-      options: {
+    { 
+      resource: SentEmail, 
+      options: { 
+        id: 'SentEmail',
+        label: 'Sent Email Logs',
         navigation: { name: 'Communications', icon: 'Mail' },
         listProperties: ['to', 'subject', 'type', 'created_at'],
         properties: {
@@ -464,6 +481,20 @@ const adminJs = new AdminJS({
           ...drawerActions,
           new: { isVisible: false }
         }
+      }
+    },
+    { 
+      resource: ProjectURL, 
+      options: { 
+        id: 'ProjectURL',
+        label: 'Project URLs',
+        navigation: { name: 'Projects', icon: 'Link' },
+        listProperties: ['url', 'project_id'],
+        properties: {
+          id: { isVisible: { list: false, show: true, edit: false, filter: true } },
+          project_id: { resourceId: 'Project' }
+        },
+        actions: drawerActions,
       }
     }
   ],
@@ -482,30 +513,39 @@ const adminJs = new AdminJS({
   },
   locale: {
     translations: {
-      resources: {
-        auth_user: { label: 'Users' },
-        api_project: { label: 'Projects' },
-        api_team: { label: 'Team Members' },
-        api_client: { label: 'Clients' },
-        api_testimonial: { label: 'Testimonials' },
-        api_projectcategory: { label: 'Categories' },
-        api_cmstable: { label: 'CMS Tables' },
-        api_service: { label: 'Services' },
-        api_aboutus: { label: 'About Us' },
-        api_award: { label: 'Awards' },
-        api_contact: { label: 'Contact Inquiries' },
-        api_task: { label: 'Project Tasks' },
-        api_cost: { label: 'Project Costs' },
-        api_projectimage: { label: 'Project Photos' },
-        api_cmstableimage: { label: 'CMS Table Photos' },
-        api_projecturl: { label: 'Project URLs' },
-        api_sentemail: { label: 'Sent Email Logs' }
-      },
-      actions: {
-        bulkDelete: 'Delete Selected',
-      },
-      buttons: {
-        filter: 'Filter Projects'
+      en: {
+        resources: {
+          User: { label: 'Users' },
+          Project: { label: 'Projects' },
+          TeamMember: { label: 'Team Members' },
+          Client: { label: 'Clients' },
+          Testimonial: { label: 'Testimonials' },
+          ProjectCategory: { label: 'Categories' },
+          CmsTable: { label: 'CMS Tables' },
+          Service: { label: 'Services' },
+          AboutUs: { label: 'About Us' },
+          Award: { label: 'Awards' },
+          Contact: { label: 'Contact Inquiries' },
+          Task: { label: 'Project Tasks' },
+          Cost: { label: 'Project Costs' },
+          ProjectPhoto: { label: 'Project Photos' },
+          CmsTablePhoto: { label: 'CMS Table Photos' },
+          ProjectURL: { label: 'Project URLs' },
+          SentEmail: { label: 'Sent Email Logs' }
+        },
+        labels: {
+          navigation: 'APIs',
+          pages: 'Admin Pages',
+        },
+        messages: {
+           navigation: 'APIs',
+        },
+        actions: {
+          bulkDelete: 'Delete Selected',
+        },
+        buttons: {
+          filter: 'Filter Projects'
+        }
       }
     },
   },

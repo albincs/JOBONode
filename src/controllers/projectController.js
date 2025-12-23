@@ -1,4 +1,4 @@
-import { Project, ProjectImage, ProjectURL, ProjectCategory, Client } from '../models/index.js';
+import { Project, ProjectImage, ProjectURL, ProjectCategory, Client, Task, Cost } from '../models/index.js';
 
 export const getAllProjects = async (req, res) => {
   try {
@@ -7,7 +7,9 @@ export const getAllProjects = async (req, res) => {
         { model: ProjectImage, as: 'images' },
         { model: ProjectURL, as: 'urls' },
         { model: ProjectCategory, as: 'project_category' },
-        { model: Client, as: 'project_client' }
+        { model: Client, as: 'project_client' },
+        { model: Task, as: 'tasks' },
+        { model: Cost, as: 'costs' }
       ]
     });
     res.json(projects);
@@ -26,7 +28,9 @@ export const getProjectBySlug = async (req, res) => {
         { model: ProjectImage, as: 'images' },
         { model: ProjectURL, as: 'urls' },
         { model: ProjectCategory, as: 'project_category' },
-        { model: Client, as: 'project_client' }
+        { model: Client, as: 'project_client' },
+        { model: Task, as: 'tasks' },
+        { model: Cost, as: 'costs' }
       ]
     });
 
@@ -49,7 +53,9 @@ export const getProjectById = async (req, res) => {
         { model: ProjectImage, as: 'images' },
         { model: ProjectURL, as: 'urls' },
         { model: ProjectCategory, as: 'project_category' },
-        { model: Client, as: 'project_client' }
+        { model: Client, as: 'project_client' },
+        { model: Task, as: 'tasks' },
+        { model: Cost, as: 'costs' }
       ]
     });
 
