@@ -120,7 +120,7 @@ const adminJs = new AdminJS({
     { 
       resource: User, 
       options: { 
-        id: 'User',
+        id: 'auth_user',
         label: 'Users',
         navigation: { name: 'User Management', icon: 'User' },
         listProperties: ['email', 'username', 'role', 'is_active', 'is_staff'],
@@ -140,7 +140,7 @@ const adminJs = new AdminJS({
     { 
       resource: Project, 
       options: { 
-        id: 'Project',
+        id: 'api_project',
         label: 'Projects',
         navigation: { name: 'Projects', icon: 'Folder' },
         listProperties: ['title', 'slug', 'start_date', 'end_date', 'is_completed'],
@@ -206,7 +206,7 @@ const adminJs = new AdminJS({
     { 
       resource: Client, 
       options: { 
-        id: 'Client',
+        id: 'api_client',
         label: 'Clients',
         navigation: { name: 'Company', icon: 'Briefcase' },
         listProperties: ['logo', 'name', 'email', 'phone'],
@@ -228,7 +228,7 @@ const adminJs = new AdminJS({
         id: 'Testimonial',
         label: 'Testimonials',
         navigation: { name: 'Company', icon: 'MessageSquare' },
-        listProperties: ['photo', 'name', 'role', 'created_at'],
+        listProperties: ['photo', 'name', 'role', 'date'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           photo: { isVisible: false },
@@ -239,7 +239,7 @@ const adminJs = new AdminJS({
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           },
-          created_at: { position: 4, type: 'datetime' }
+          date: { position: 4, type: 'date' }
         },
         actions: drawerActions,
       },
@@ -248,7 +248,7 @@ const adminJs = new AdminJS({
     { 
       resource: ProjectCategory, 
       options: { 
-        id: 'ProjectCategory',
+        id: 'api_projectcategory',
         label: 'Categories',
         navigation: { name: 'Projects', icon: 'Tag' },
         listProperties: ['name', 'slug', 'parent_id'],
@@ -256,7 +256,7 @@ const adminJs = new AdminJS({
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           name: { isTitle: true, position: 1 },
           slug: { position: 2, isVisible: { list: true, show: true, edit: false, filter: true, new: false } },
-          parent_id: { position: 3, resourceId: 'ProjectCategory' }
+          parent_id: { position: 3, reference: 'api_projectcategory' }
         },
         actions: drawerActions,
       } 
@@ -264,10 +264,10 @@ const adminJs = new AdminJS({
     { 
       resource: CmsTable, 
       options: { 
-        id: 'CmsTable',
+        id: 'api_cmstable',
         label: 'CMS Tables',
         navigation: { name: 'Content', icon: 'FileText' },
-        listProperties: ['title', 'slug', 'created_at'],
+        listProperties: ['title', 'slug'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           title: { isTitle: true, position: 1 },
@@ -276,7 +276,6 @@ const adminJs = new AdminJS({
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           },
-          created_at: { position: 3, type: 'datetime' },
           image: { isVisible: { list: false, show: true, edit: true, filter: false } },
           // Reference to CmsTableImages
           images: {
@@ -307,7 +306,7 @@ const adminJs = new AdminJS({
         id: 'Service',
         label: 'Services',
         navigation: { name: 'Content', icon: 'Box' },
-        listProperties: ['image', 'title', 'slug', 'created_at'],
+        listProperties: ['image', 'title', 'slug'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           image: { isVisible: false },
@@ -318,7 +317,6 @@ const adminJs = new AdminJS({
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           },
-          created_at: { position: 4, type: 'datetime' }
         },
         actions: drawerActions,
       },
@@ -330,7 +328,7 @@ const adminJs = new AdminJS({
         id: 'AboutUs',
         label: 'About Us',
         navigation: { name: 'Content', icon: 'Info' },
-        listProperties: ['title', 'slug', 'created_at'],
+        listProperties: ['title', 'slug'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           title: { isTitle: true, position: 1 },
@@ -339,7 +337,6 @@ const adminJs = new AdminJS({
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           },
-          created_at: { position: 3, type: 'datetime' }
         },
         actions: drawerActions,
       } 
@@ -363,7 +360,7 @@ const adminJs = new AdminJS({
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           },
-          project_id: { resourceId: 'Project' }
+          project_id: { reference: 'api_project' }
         },
         actions: drawerActions,
       },
@@ -396,16 +393,15 @@ const adminJs = new AdminJS({
         id: 'Task',
         label: 'Project Tasks',
         navigation: { name: 'Projects', icon: 'CheckSquare' },
-        listProperties: ['name', 'project_id', 'created_at'],
+        listProperties: ['name', 'project_id'],
         properties: { 
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           name: { isTitle: true, position: 1 },
-          project_id: { position: 2, resourceId: 'Project' },
+          project_id: { position: 2, reference: 'api_project' },
           description: { 
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
           },
-          created_at: { position: 3, type: 'datetime' }
         },
         actions: drawerActions,
       } 
@@ -421,7 +417,7 @@ const adminJs = new AdminJS({
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           name: { isTitle: true, position: 1 },
           amount: { position: 2, type: 'currency' },
-          project_id: { position: 3, resourceId: 'Project' },
+          project_id: { position: 3, reference: 'api_project' },
           description: { 
             type: 'richtext',
             isVisible: { list: false, show: true, edit: true, filter: false }
@@ -436,13 +432,12 @@ const adminJs = new AdminJS({
         id: 'ProjectPhoto',
         label: 'Project Photos',
         navigation: { name: 'Projects', icon: 'Image' },
-        listProperties: ['uploadedFile', 'project_id', 'created_at'],
+        listProperties: ['uploadedFile', 'project_id'],
         properties: {
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           image: { isVisible: false },
           uploadedFile: { isVisible: { list: true, show: true, edit: true, filter: false }, position: 1 },
-          project_id: { position: 2, resourceId: 'Project' },
-          created_at: { position: 3, type: 'datetime' }
+          project_id: { position: 2, reference: 'api_project' },
         },
         actions: drawerActions,
       },
@@ -459,7 +454,7 @@ const adminJs = new AdminJS({
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
           image: { isVisible: false }, // Handled by upload feature
           uploadedFile: { isVisible: { list: true, show: true, edit: true, filter: false }, position: 1 },
-          cmstable_id: { position: 2, resourceId: 'CmsTable' },
+          cmstable_id: { position: 2, reference: 'api_cmstable' },
           order: { position: 3 }
         },
         actions: drawerActions,
@@ -492,7 +487,7 @@ const adminJs = new AdminJS({
         listProperties: ['url', 'project_id'],
         properties: {
           id: { isVisible: { list: false, show: true, edit: false, filter: true } },
-          project_id: { resourceId: 'Project' }
+          project_id: { reference: 'api_project' }
         },
         actions: drawerActions,
       }
@@ -515,13 +510,13 @@ const adminJs = new AdminJS({
     translations: {
       en: {
         resources: {
-          User: { label: 'Users' },
-          Project: { label: 'Projects' },
+          api_user: { label: 'Users' },
+          api_project: { label: 'Projects' },
           TeamMember: { label: 'Team Members' },
-          Client: { label: 'Clients' },
+          api_client: { label: 'Clients' },
           Testimonial: { label: 'Testimonials' },
-          ProjectCategory: { label: 'Categories' },
-          CmsTable: { label: 'CMS Tables' },
+          api_projectcategory: { label: 'Categories' },
+          api_cmstable: { label: 'CMS Tables' },
           Service: { label: 'Services' },
           AboutUs: { label: 'About Us' },
           Award: { label: 'Awards' },
